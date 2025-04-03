@@ -24,9 +24,9 @@ app.use('/api/incidents', incidentRoutes);
 app.use('/api/users', userRoutes);  
 app.use('/api/history', updateHistoryRoutes); // ✅ Nueva ruta para historial
 
-// ✅ Endpoint de Health Check para Render
+// ✅ Endpoint de Health Check para Render (IMPORTANTE)
 app.get('/health', (req, res) => {
-    res.status(200).send("Server is healthy!");
+    res.status(200).send("✅ El backend está funcionando correctamente");
 });
 
 const PORT = process.env.PORT || 5001;
