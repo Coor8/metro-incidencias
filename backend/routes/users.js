@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const UpdateHistory = require('../models/UpdateHistory'); // ✅ Importar el modelo de historial
 const verifyToken = require('../middleware/verifyToken');
@@ -82,13 +83,15 @@ router.post('/register', verifyToken, verifyAdmin, async (req, res) => {
     try {
         const { nombre, correo, contraseña, rol } = req.body;
 
-        const nuevoUsuario = new User({ nombre, correo, contraseña, rol });
+        // 🔒 Encriptar la contraseña antes de guardarla
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(contraseña, salt);
+
+        const nuevoUsuario = new User({ nombre, correo, contraseña: hashedPassword, rol });
         await nuevoUsuario.save();
 
-        // ✅ Obtener el nombre del administrador que realiza la acción
         const admin = await User.findById(req.userId).select('nombre');
 
-        // ✅ Registrar en el historial
         const nuevoHistorial = new UpdateHistory({
             recursoId: nuevoUsuario._id,
             tipoRecurso: 'Usuario',
@@ -104,6 +107,7 @@ router.post('/register', verifyToken, verifyAdmin, async (req, res) => {
         res.status(500).json({ error: 'Error al crear usuario' });
     }
 });
+
 
 // ✅ Obtener el historial de actualizaciones
 router.get('/history', verifyToken, verifyAdmin, async (req, res) => {
