@@ -11,7 +11,11 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: '*', // Permitir solicitudes desde cualquier origen. Cambia esto por tu URL de frontend si es necesario.
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
